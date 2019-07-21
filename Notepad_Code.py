@@ -12,13 +12,20 @@ class Notepad:
 
     NotepadWidth = 500
     NotepadHeight = 500
-    NotepadMenu = Menu(master)
-    FileMenu = Menu(NotepadMenu)
-    EditMenu = Menu(NotepadMenu)
-    HelpMenu = Menu(NotepadMenu)
     TextArea = Text(master,bg = '#e3fdfd')
     NotepadScrollbar = Scrollbar(TextArea)
     MyLabel = Label(master,text = "Made with ❤️ by ABHISHEK",bg = "#71c9ce",fg = 'red')
+
+    NotepadMenu = Menu(master)
+
+    Submenus = {
+        "File" : Menu(NotepadMenu,tearoff = 0),
+        "Edit" : Menu(NotepadMenu,tearoff = 0),
+        "Help" : Menu(NotepadMenu,tearoff = 0)
+        }
+
+    
+
 
     def __init__(self,**kwargs):
 
@@ -45,30 +52,42 @@ class Notepad:
             pass
 
 
+        # Adding My Label.
+        self.MyLabel.pack(fill = X)
 
-        #Adding Primary menu to the master window
-        self.master.config(menu = self.NotepadMenu)
-
-        #Adding secondary menus to the primary menu bar
-        self.NotepadMenu.add_cascade(label = "File",menu = self.FileMenu)
-        self.NotepadMenu.add_cascade(label = "Edit",menu = self.EditMenu)
-        self.NotepadMenu.add_cascade(label = "Help",menu = self.HelpMenu)
+        # Adding Text Area
+        self.TextArea.pack(fill=BOTH,expand = 1)
 
 
-        #Adding File Menu Contents
-        self.FileMenu.add_command(label = "New",command = self.NewFile)
-        self.FileMenu.add_command(label = "Open",command = self.OpenFile)
-        self.FileMenu.add_command(label = "Save",command = self.SaveFile)
-        self.FileMenu.add_command(label = "Quit",command = self.QuitFile)
+##########  Adding menus to the Notepad    ##################
+        
+        self.AddMainMenu()
 
+        for name,menu in self.Submenus.items():
+            self.NotepadMenu.add_cascade(label = name , menu = menu)
 
-        #Adding the Edit Menu Commands
-        self.EditMenu.add_command(label  = "Cut",command = self.Cut)
-        self.EditMenu.add_command(label = 'Copy', command = self.Copy)
-        self.EditMenu.add_command(label = 'Paste', command = self.Paste)
+        File_commands = {
+        "New" : self.NewFile ,
+        "Open" : self.OpenFile ,
+        "Save" : self.SaveFile ,
+        "Quit" : self.QuitFile
+        }
+        
+        Edit_commands = {
+        "Cut" : self.Cut , 
+        "Copy" : self.Cut , 
+        "Paste" : self.Paste ,  
+        }
 
-        #Adding the Help Menu Contents
-        self.HelpMenu.add_command(label = "About Us",command = self.ShowAbout)
+        Help_commands = {
+        "About Us" : self.ShowAbout
+        }
+
+        
+        self.AddCommandsToSubmenu(self.Submenus["File"],File_commands)
+        self.AddCommandsToSubmenu(self.Submenus["Edit"],Edit_commands)
+        self.AddCommandsToSubmenu(self.Submenus["Help"],Help_commands)
+       
 
 
         ###########################   RUN BUTTON   ######################################
@@ -89,13 +108,12 @@ class Notepad:
         self.TextArea.config(yscrollcommand=self.NotepadScrollbar.set)
 
 
-        ####################################        ADDING MY LABEL ##########################################
-
-        self.MyLabel.pack(fill = X)
-
-        ####################################      ADDING TEXT AREA   ######################################
-        self.TextArea.pack(fill=BOTH,expand = 1)
+        
         #####################################       RUNNING THE MASTER WINDOW   #################################
+        
+        
+        
+        
         self.master.mainloop()
 
 
@@ -121,6 +139,23 @@ class Notepad:
         top = (ScreenHeight/2) - (self.NotepadHeight/2)
 
         master.geometry('%dx%d+%d+%d' %(self.NotepadWidth,self.NotepadHeight,left,top))
+
+
+     #############################    ADDING MENU FUNCTIONS   ###############################
+
+    # Adding Main menu to the menu bar 
+    def AddMainMenu(self):
+        self.master.config(menu = self.NotepadMenu)
+
+    # Adding submenus
+    def AddSubMenu(self,name,menu):
+        self.NotepadMenu.add_cascade(label = name,menu = menu)
+
+    # Adding commands to the submenu
+    def AddCommandsToSubmenu(self,menu,commands_dict):
+        for name,func in commands_dict.items():
+            menu.add_command(label = name , command = func)
+
 
     ################################   FILE FUNCTIONS   ##########################################################
     def NewFile(self):
