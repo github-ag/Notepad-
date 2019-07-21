@@ -15,8 +15,8 @@ class Notepad:
     TextArea = Text(master,bg = '#e3fdfd')
     NotepadScrollbar = Scrollbar(TextArea)
     MyLabel = Label(master,text = "Made with ❤️ by ABHISHEK",bg = "#71c9ce",fg = 'red')
-
     NotepadMenu = Menu(master)
+    bracketsInText = 0
 
     Submenus = {
         "File" : Menu(NotepadMenu,tearoff = 0),
@@ -108,6 +108,17 @@ class Notepad:
         self.TextArea.config(yscrollcommand=self.NotepadScrollbar.set)
 
 
+
+
+
+        ####################################        Decribing the keys which we want to overwrite    #############
+        keyList = ["KeyPress-Return","Tab","}","{"]
+        for buttonPressed in keyList:
+            self.TextArea.bind('<' + buttonPressed + '>',self.handlePressedKey)
+            #bind function will automatically store the key pressed and pass it to its associative function.
+
+
+
         
         #####################################       RUNNING THE MASTER WINDOW   #################################
         
@@ -118,7 +129,7 @@ class Notepad:
 
 
 ############################################################  CONSTRUCTOR OVER  #########################################################################################333
-
+##################################################################################################################################################
 
     ##################################  CONSTRUCTOR FUNCTIONS  ##########################################################
     def set_dimensions(self,master,**kwargs):
@@ -252,11 +263,39 @@ class Notepad:
 
 
 
+    def handlePressedKey(self,keyPressed):
+        print(keyPressed) # gives complete information about the pressed key
+        if keyPressed.char == '\r':
+            self.TextArea.insert("insert",'\n')
+            self.AddIndentation()
+        elif keyPressed.char == "\t":
+            self.TextArea.insert("insert", ' ' * 4)
+        elif keyPressed.char == "{":
+            self.TextArea.insert("insert", '{')
+            self.bracketsInText += 1
+        elif keyPressed.char == "}":
+            self.bracketsInText -= 1
+            curr = self.TextArea.get("end-1c linestart","end")
+            print(':' + curr + ':')
+            if curr.strip() == "" or curr == None:
+                self.TextArea.delete("end-5c","end")
+                if curr == "    \n":    # Four spaces then \n
+                    self.TextArea.insert("insert", '\n')
+            self.TextArea.insert("insert", '}')
+         
+        return 'break'
+
+    def AddIndentation(self):
+        currText = str(self.TextArea.get(1.0,END)).strip()
+        def AddSpaces():
+            self.TextArea.insert("insert", ' ' * 4 * self.bracketsInText)
+
+        AddSpaces()
 
 
-    ### Running the master window
-    def Run(self):
-        self.master.mainloop()
+
+
+
 
 
 obj = Notepad()
